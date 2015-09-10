@@ -8,6 +8,7 @@ host, web, db Make 3 server for rails
 * roles
 * hosts
 * ansible.cfg
+* playbook.yml
 
 
 ## リリース方法
