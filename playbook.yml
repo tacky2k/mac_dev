@@ -1,0 +1,15 @@
+---
+- hosts: all
+  sudo: yes
+  roles:
+    - common
+#    - tmux
+- hosts: web
+  sudo: yes
+  roles:
+    - web
+- hosts: db
+  sudo: yes
+  roles:
+    - database
+

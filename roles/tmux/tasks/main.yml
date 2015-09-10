@@ -1,0 +1,6 @@
+- name: tmux install
+  yum: name=http://dl.fedoraproject.org/pub/epel/6/x86_64/tmux-1.6-3.el6.x86_64.rpm state=present
+
+#- name: tmux start
+#  command: tmux
+  

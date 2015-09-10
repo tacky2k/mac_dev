@@ -1,0 +1,34 @@
+#- name: httpd install
+#  yum: name=httpd state=absent
+#- name: httpd start and chkconfig
+#  service: name=httpd  state=stopped enabled=no
+- name: nginx install
+  yum:  name=nginx state=latest
+# mkdir /etc/nginx/sites-available
+#- name: mkdir sites-available
+#  command: mkdir /etc/nginx/sites-available
+
+# mkdir /etc/nginx/sites-enabled
+#- name: mkdir sites-enabled
+#  command: mkdir /etc/nginx/sites-enabled
+# rm -f /etc/nginx/conf.d/*.conf
+#- name: rf *.conf
+#  command: rf -f /etc/nginx/conf.d/*.conf
+# service nginx start
+- name: nginx start
+  service: name=nginx state=started
+# gem install unicorn-rails
+# su asago
+# add 'unicorn' in Gemfiles
+# bundle install
+# copy /home/asago/rails_root/config/unicorn.rb
+# exit asago user
+# /etc/init.d/asago create
+# chmod 755 /etc/init.d/asago
+# service asago start
+# chkconfig asago on
+# make /etc/ninx/sites-available/default 
+# ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled
+# make /etc/nginx/sites-available/asago
+# ln -s /etc/nginx/sites-available/asago /etc/nginx/sites-enabled/
+# rm /etc/nginx/sites-enabled/asago

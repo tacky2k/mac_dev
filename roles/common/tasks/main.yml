@@ -1,0 +1,91 @@
+- name: User Add
+  user: name=testuser state=absent
+- name: epel install
+  yum: name=epel-release state=present
+- name: yum package install (ntp,httpd)
+  yum: name={{item}} state=present
+  with_items:
+    - ntp
+    - git
+- name: ntp start
+  service: name=ntpd state=started enabled=yes
+
+- name: Install libselinux-python
+  yum: name=libselinux-python state=present
+
+- name: Check status of selinux
+  shell: getenforce
+
+- name: Permissive selinux
+  selinux: policy=targeted state=permissive
+
+- name: reboot after change selinux
+  shell: sleep 2s && /sbin/reboot &
+
+#- name: wait for the server to go down (reboot)
+#  local_action: wait_for host={{ inventory_hostname }} port=22 state=stopped
+
+#- name: wait for the server to come up
+#  local_action: wait_for host={{ inventory_hostname }} port=22 delay=30
+
+#- name: Check status of selinux
+#  shell: getenforce
+
+
+- name: yum package install
+  yum: name={{item}} state=present
+  with_items:
+    - memcached
+    - npm
+    - ImageMagick
+    - libxml2-devel
+    - libxslt-devel
+    - ruby
+    - nodejs
+    - readline-devel
+- name: check out rbenv
+  sudo: yes
+  sudo_user: vagrant
+  git: repo={{ rbenv.repo }} dest=./.rbenv accept_hostkey=yes
+
+- name: add .rbenv/bin to $PATH
+  sudo: yes
+  sudo_user: vagrant
+  lineinfile: dest=.bash_profile line=export\ PATH=".rbenv/bin:$PATH" regexp=PATH.*rbenv create=yes
+
+- name: add rbenv init
+  sudo: yes
+  sudo_user: vagrant
+  lineinfile: dest=.bash_profile line=eval\ \"$(rbenv\ init\ -)\" regexp=eval.*rbenv create=yes
+
+- name: checkout ruby-build as rbenv plugin
+  sudo: yes
+  sudo_user: vagrant
+  git: repo={{ rubybuild.repo }} dest=.rbenv/plugins/ruby-build accept_hostkey=yes
+
+- name: check whether as specific version of ruby is installed or not
+  sudo: yes
+  sudo_user: vagrant
+  shell: .rbenv/bin/rbenv versions | grep {{ ruby.version }} | tr '*' ' ' | sed -e 's/\s\+//' | cut -f1 -d' '
+  register: rbenv_version
+
+- name: install ruby with rbenv
+  sudo: yes
+  sudo_user: vagrant
+  command: .rbenv/bin/rbenv install {{ ruby.version }}
+  when: rbenv_version.stdout != "{{ ruby.version }}"
+
+- name: set ruby version global
+  sudo: yes
+  sudo_user: vagrant
+  command: .rbenv/bin/rbenv global {{ ruby.version }}
+
+- name: update gems
+  command: .rbenv/shims/gem update --system
+
+- name: install bundler gem
+  command: .rbenv/shims/gem install bundler --no-ri --no-rdoc
+
+- name: rbenv rehash
+  command: .rbenv/bin/rbenv rehash
+
